@@ -87,7 +87,6 @@ def get_replace(url):
 
 def get_date(bias=0):
     now = datetime.now()
-    # now = datetime(2021, 1, 9, 12, 40)
     if now.weekday() == 6:
         now += timedelta(days=1)
     elif now.time() > time(12, 00):  # 12, 00 - msk (msk - 3)
@@ -107,17 +106,6 @@ def get_date(bias=0):
     weekday = days_of_the_week[now.weekday()]
     denominator = (now.isocalendar()[1]) % 2
     return {"day": now.day, "month": month_out, "weekday": weekday, "denominator": denominator}
-
-
-# def resize(file_path):
-#     im = Image.open(file_path)
-#     img = cv2.cvtColor(np.array(im), cv2.COLOR_RGB2BGR)
-#     i = 0
-#     for line in reversed(img):
-#         i += 1
-#         if [0, 0, 0] in line:
-#             break
-#     im.crop((0, 115, 800, 4025 - i)).save(file_path)
 
 
 class TimetableBot:
@@ -166,44 +154,7 @@ class TimetableBot:
                 print(f"Ошибка {E}\n{str(extract_tb(exc_info()[2]))}")
                 msg(f"Ошибка {E}\n{str(extract_tb(exc_info()[2]))}", 194701989)
 
-    # def replacements_to_img(self):
-    #     try:
-    #         urls = [
-    #             "https://menu.sttec.yar.ru/timetable/rasp_first.html",
-    #             "https://menu.sttec.yar.ru/timetable/rasp_second.html"
-    #         ]
-    #         hti.screenshot(url=urls[0], save_as='rasp_first.png', size=(800, 4000))
-    #         hti.screenshot(url=urls[1], save_as='rasp_second.png', size=(800, 4000))
-    #         resize("rasp_first.png")
-    #         resize("rasp_second.png")
-    #         rasp_first_upload = requests.post(vk.method("photos.getMessagesUploadServer")['upload_url'],
-    #                                           files={'photo': open('rasp_first.png', 'rb')}).json()
-    #         rasp_second_upload = requests.post(vk.method("photos.getMessagesUploadServer")['upload_url'],
-    #                                            files={'photo': open('rasp_second.png', 'rb')}).json()
-    #         rasp_first_data = vk.method('photos.saveMessagesPhoto',
-    #                                     {'photo': rasp_first_upload['photo'], 'server': rasp_first_upload['server'],
-    #                                      'hash': rasp_first_upload['hash']})[0]
-    #         rasp_second_data = vk.method('photos.saveMessagesPhoto',
-    #                                      {'photo': rasp_second_upload['photo'], 'server': rasp_second_upload['server'],
-    #                                       'hash': rasp_second_upload['hash']})[0]
-    #         rasp_first = "photo{}_{}".format(rasp_first_data["owner_id"], rasp_first_data["id"])
-    #         rasp_second = "photo{}_{}".format(rasp_second_data["owner_id"], rasp_second_data["id"])
-    #         self.replacements_photos = f"{rasp_first},{rasp_second}"
-    #     except Exception as E:
-    #         print(f"Ошибка {E}\n{str(extract_tb(exc_info()[2]))}")
-    #         msg(f"Ошибка {E}\n{str(extract_tb(exc_info()[2]))}", 194701989)
-
     def save_persons(self):
-        # try:
-        #     headers = {
-        #         "Content-Type": "application/json",
-        #         "Accept": "application/json",
-        #         "x-requested-with": "XMLHttpRequest"
-        #     }
-        #     requests.put(self.persons_url, headers=headers, data=json.dumps(self.persons))
-        # except Exception as E:
-        #     print(f"Ошибка {E}\n{str(extract_tb(exc_info()[2]))}")
-        #     msg(f"Ошибка {E}\n{str(extract_tb(exc_info()[2]))}", 194701989)
         pass
 
     def get_all_teacher_replace(self, this_replacements):
@@ -445,8 +396,6 @@ class TimetableBot:
                 # self.save_persons()
 
     def clear_person(self, person_id_to_clear, send_msg=True):
-        # self.persons[person_id_to_clear] = {}
-        # self.save_persons()
         roles = ['Студент', 'Учитель']
         self.db.del_user(person_id_to_clear)
         if send_msg:
@@ -879,14 +828,6 @@ class TimetableBot:
 persons_to_get_help = []
 
 
-# MainBot = TimeTableBot()
-# sleep(.2)
-# with open("save_persons", 'r', encoding='utf-8') as f:
-#     all_persons = json.load(f)
-# for k, person in enumerate(all_persons):
-#     print(f"[{k}]", MainBot.get_person_time(person))
-# input()
-
 def get_help(person_id):
     msg("Напишите ваше обращение", person_id)
     persons_to_get_help.append((person_id))
@@ -894,49 +835,6 @@ def get_help(person_id):
 
 def send_abstract(event, user_id):
     pass
-
-# @thread
-# def send_abstract(event, user_id):
-#     is_good = False
-#     document = Document()
-#     p = document.add_paragraph()
-#     r = p.add_run()
-#     sections = document.sections
-#     for section in sections:
-#         section.top_margin = Pt(10)
-#         section.bottom_margin = Pt(10)
-#         section.left_margin = Pt(30)
-#         section.right_margin = Pt(30)
-#     for item in event['items'][0]['attachments']:
-#         if item['type'] != 'photo':
-#             continue
-#         is_good = True
-#         photo_sizes = {size['height']: size['url'] for size in item['photo']['sizes']}
-#         url = photo_sizes[max(photo_sizes.keys())]
-#         img = requests.get(url).content
-#         file = io.BytesIO(img)
-#         width = 555
-#         img = Image.open(file)
-#         ratio = (width / float(img.size[0]))
-#         height = int((float(img.size[1]) * float(ratio)))
-#         r.add_picture(file, width=Pt(width), height=Pt(height))
-#     if not is_good:
-#         return 0
-#     msg('⌚Документ создаётся..', user_id)
-#     file = io.BytesIO()
-#     file_name = get_surname_by_id(user_id) + ".docx"
-#     file.name = file_name
-#     document.save(file)
-#     file.seek(0)
-#     upload_url = vk_.docs.getMessagesUploadServer(type='doc', peer_id=user_id)['upload_url']
-#     response = requests.post(upload_url, files={'file': file})
-#     result = json_.loads(response.text)
-#     file = result['file']
-#     file_info = vk_.docs.save(file=file, title=file_name, tags=[])
-#     owner_id = file_info['doc']['owner_id']
-#     photo_id = file_info['doc']['id']
-#     vk.method("messages.send", {'peer_id': user_id, 'random_id': random.randint(1, 2147483647), 'attachment': f"doc{owner_id}_{photo_id}"})
-
 
 def main():
     MainBot = TimetableBot()
@@ -957,7 +855,6 @@ def main():
         "Числитель": lambda: MainBot.get_week_timetable(person_id, denominator=False),
         "Знаменатель": lambda: MainBot.get_week_timetable(person_id, denominator=True),
         "Поддержка": lambda: get_help(person_id),
-        # "Замены на сайте": lambda: msg("Замены на сайте", person_id, attachment=MainBot.replacements_photos)
     }
 
     longpoll = VkLongPoll(vk)
